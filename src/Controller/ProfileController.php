@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Profile;
 use App\Form\ProfileType;
 use App\Repository\ProfileRepository;
+use App\Utils\FileManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,8 +26,11 @@ class ProfileController extends Controller
 
     /**
      * @Route("/new", name="profile_new", methods="GET|POST")
+     * @param Request $request
+     * @param FileManager $fileManager
+     * @return Response
      */
-    public function new(Request $request): Response
+    public function new(Request $request, FileManager $fileManager): Response
     {
         $profile = new Profile();
         $form = $this->createForm(ProfileType::class, $profile);
@@ -34,9 +38,16 @@ class ProfileController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            $em->getConnection()->beginTransaction();
+            $file = $profile->getAvatar();
+            dump($file);
+            $filename = $fileManager->uploadFile($file);
+            $profile->setAvatar($filename);
             $em->persist($profile);
+
             $em->flush();
 
+            $em->commit();
             return $this->redirectToRoute('profile_index');
         }
 

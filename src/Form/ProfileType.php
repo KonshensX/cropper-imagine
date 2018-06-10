@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\Profile;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\FileType
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,8 +15,10 @@ class ProfileType extends AbstractType
         $builder
             ->add('username')
             ->add('email')
-            ->add('avatar', FileType::class)
             ->add('fullname')
+            ->add('avatar', FileType::class, [
+                'label' => 'Profile picture'
+            ])
         ;
     }
 
